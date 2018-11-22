@@ -26,6 +26,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private var locationManager: LocationManager? = null
     private var locationListener: LocationListener? = null
+    private var local_lat: Double? = null
+    private var local_lng: Double? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +40,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationListener = object : LocationListener {
             override fun onLocationChanged(location: Location?) {
-                latitudeText.setText(""+location!!.latitude)
-                longtitudeText.setText(""+location!!.longitude)
+                //latitudeText.setText(""+location!!.latitude)
+                local_lat = location!!.latitude
+                //longtitudeText.setText(""+location!!.longitude)
+                local_lng = location!!.longitude
             }
 
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -56,6 +60,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         requestLocation()
+
+        gpsBtn.setOnClickListener {
+            latitudeText.setText(local_lat.toString())
+            longtitudeText.setText(local_lng.toString())
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -73,9 +82,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             return
         }
-        gpsBtn.setOnClickListener {
-            locationManager!!.requestLocationUpdates("gps",5000,0F,locationListener)
-        }
+        locationManager!!.requestLocationUpdates("gps",5000,0F,locationListener)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -89,6 +96,5 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             mMap.addMarker(MarkerOptions().position(marker).title(marker.toString()))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(marker))
         }
-
     }
 }
